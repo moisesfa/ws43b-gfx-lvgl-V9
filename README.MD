@@ -12,7 +12,10 @@ Me encontré con este [repositorio](https://github.com/Westcott1/Waveshare-ESP32
 
 ![](docs/img/result.png)
 
+![](docs/img/result.jpg)
+
 </div>
+
 
 > [!NOTE]
 > Intalar correctamente la librería lvgll en la carpeta .pio tal y como se describe en la [documentación](https://docs.lvgl.io/9.2/integration/framework/arduino.html)
