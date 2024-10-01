@@ -51,3 +51,41 @@ void ui_example1(void)
     lv_example_button_1();
     
 }
+
+static void btn3_event_cb(lv_event_t * e) {
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t * label = (lv_obj_t*) lv_event_get_user_data(e);
+  
+  if(code == LV_EVENT_CLICKED) {
+    static uint8_t counter = 0;
+    counter++;
+    lv_label_set_text_fmt(label, "Counter: %d", counter);
+    LV_LOG_USER("Counter: %d", counter);
+  }
+  
+}
+
+void ui_example2(void)
+{
+// Create a Button 
+  lv_obj_t * btn3 = lv_button_create(lv_screen_active());    
+  lv_obj_set_size(btn3, 120, 50);                                  // Set the btn3 size
+  lv_obj_align(btn3, LV_ALIGN_CENTER, 0, 0);
+  
+  // Add a label to the btn3
+  lv_obj_t * btn3_label = lv_label_create(btn3);     
+  lv_label_set_text(btn3_label, "Click here!");        // Set the labels text
+  lv_obj_center(btn3_label);
+
+  lv_obj_t * tl_counter = lv_label_create(lv_screen_active());
+  lv_label_set_text(tl_counter, "Counter: 0");
+  lv_obj_align(tl_counter, LV_ALIGN_BOTTOM_MID, 0, -70);
+
+  /// Establece el tipo y tamaño de fuente. Más información: // https://docs.lvgl.io/master/overview/font.html
+  static lv_style_t style_text_label; 
+  lv_style_init(&style_text_label); 
+  lv_style_set_text_font(&style_text_label, &lv_font_montserrat_34); 
+  lv_obj_add_style(tl_counter, &style_text_label, 0);
+
+  lv_obj_add_event_cb(btn3, btn3_event_cb, LV_EVENT_ALL, tl_counter);  // Assign a callback to the button
+}

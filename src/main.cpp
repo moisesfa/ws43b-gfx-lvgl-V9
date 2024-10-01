@@ -6,6 +6,7 @@ void setup()
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
   // while(!Serial);
+  
   config_gfx_lvgl_init();
 
 }
