@@ -286,3 +286,72 @@ void lv_create_main_gui_e4(void) {
   lv_obj_add_style(button_label, &style_text_label, 0);
 
 }
+
+//***********************************
+//EJERCICIO 5
+//***********************************
+/*
+Crear y diseñar un control deslizante básico y a obtener su valor.
+El rango del control deslizante va del 0 % al 100 %. Cuando mueves el control deslizante, 
+la etiqueta de texto correspondiente se actualiza con el valor actual del control deslizante. 
+*/
+
+// Callback that prints the current slider value on the TFT display and Serial Monitor for debugging purposes
+static void event_handler_e5(lv_event_t * e) {
+  lv_obj_t * slider = (lv_obj_t*) lv_event_get_target(e);
+  lv_obj_t * slider_label = (lv_obj_t*) lv_event_get_user_data(e);
+  char buf[8];
+  lv_snprintf(buf, sizeof(buf), "%d%%", (int)lv_slider_get_value(slider));
+  lv_label_set_text(slider_label, buf);
+  LV_LOG_USER("Slider changed to %d%%", (int)lv_slider_get_value(slider));
+}
+
+void lv_create_main_gui_e5(void) {
+  // Style the range slider
+  static lv_style_t style_main;
+  lv_style_init(&style_main);
+  lv_style_set_bg_opa(&style_main, LV_OPA_COVER);
+  lv_style_set_bg_color(&style_main, lv_color_hex(0x737884));
+  lv_style_set_radius(&style_main, LV_RADIUS_CIRCLE);
+  lv_style_set_pad_ver(&style_main, -2); // Makes the indicator larger
+  
+  // Style the slider indicator
+  static lv_style_t style_indicator;
+  lv_style_init(&style_indicator);
+  lv_style_set_bg_opa(&style_indicator, LV_OPA_COVER);
+  lv_style_set_bg_color(&style_indicator, lv_color_hex(0xffcc00));
+  lv_style_set_radius(&style_indicator, LV_RADIUS_CIRCLE);
+
+  // Style the slider knob
+  static lv_style_t style_knob;
+  lv_style_init(&style_knob);
+  lv_style_set_bg_opa(&style_knob, LV_OPA_COVER);
+  lv_style_set_bg_color(&style_knob, lv_color_hex(0xcca300));
+  lv_style_set_border_color(&style_knob, lv_color_hex(0x997a00));
+  lv_style_set_border_width(&style_knob, 2);
+  lv_style_set_radius(&style_knob, LV_RADIUS_CIRCLE);
+  lv_style_set_pad_all(&style_knob, 15); // Makes the knob larger
+
+  // Create a slider aligned in the center bottom of the TFT display
+  lv_obj_t * slider = lv_slider_create(lv_screen_active());
+  lv_obj_align(slider, LV_ALIGN_CENTER, 0, -30);
+  lv_slider_set_range(slider, 0, 100);
+  lv_obj_set_style_anim_duration(slider, 2000, 0);
+  lv_obj_add_style(slider, &style_main, LV_PART_MAIN);
+  lv_obj_add_style(slider, &style_indicator, LV_PART_INDICATOR);
+  lv_obj_add_style(slider, &style_knob, LV_PART_KNOB);
+
+  // Create a label below the slider to display the current slider value
+  lv_obj_t * slider_label = lv_label_create(lv_screen_active());
+  lv_label_set_text(slider_label, "0%");
+  lv_obj_align_to(slider_label, slider, LV_ALIGN_CENTER, 0, 100);
+
+   static lv_style_t style_text_label; 
+  lv_style_init(&style_text_label); 
+  lv_style_set_text_font(&style_text_label, &lv_font_montserrat_34); 
+  lv_obj_add_style(slider_label, &style_text_label, 0);
+
+  // Add callback function to the slider
+  lv_obj_add_event_cb(slider, event_handler_e5, LV_EVENT_VALUE_CHANGED, slider_label);
+}
+

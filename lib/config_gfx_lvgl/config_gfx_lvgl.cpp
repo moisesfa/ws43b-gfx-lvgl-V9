@@ -199,9 +199,8 @@ void config_gfx_lvgl_init()
     //lv_create_main_gui_e1();
     //lv_create_main_gui_e2(); 
     //lv_create_main_gui_e3(); 
-    lv_create_main_gui_e4(); 
-
-
+    //lv_create_main_gui_e4(); 
+    lv_create_main_gui_e5(); 
     
   }
 
@@ -211,7 +210,7 @@ void config_gfx_lvgl_init()
 void config_gfx_lvgl_loop()
 {
   lv_task_handler(); /* let the GUI do its work */
-  lv_tick_inc(5);     // tell LVGL how much time has passed
+  //lv_tick_inc(5);     // tell LVGL how much time has passed
 
 #ifdef DIRECT_MODE
 #if defined(CANVAS) || defined(RGB_PANEL)
