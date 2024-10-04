@@ -197,3 +197,92 @@ void lv_create_main_gui_e3(void) {
   lv_obj_add_flag(toggle_switch, LV_OBJ_FLAG_EVENT_BUBBLE);
   lv_obj_align(toggle_switch, LV_ALIGN_CENTER, 0, 40);
 }
+
+
+//***********************************
+//EJERCICIO 4
+//***********************************
+/*
+Sabemos cómo crear botones y asociarles funciones de devolución de llamada. 
+Los botones creados tienen los estilos LVGL predeterminados. Vamos  
+a cambiar el estilo de los botones: color de fondo, ancho, alto, borde, etc.
+*/
+
+static lv_style_t style_button;
+static lv_style_t style_button_pressed;
+
+static lv_color_t darken(const lv_color_filter_dsc_t * dsc, lv_color_t color, lv_opa_t opa) {
+  LV_UNUSED(dsc);
+  return lv_color_darken(color, opa);
+}
+
+static void event_handler_e4(lv_event_t * e) {
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t * button = (lv_obj_t*) lv_event_get_target(e);
+  lv_obj_t * button_label = lv_obj_get_child(button, 0);
+
+  if(code == LV_EVENT_PRESSED) {
+    lv_label_set_text(button_label, "Clicked");
+    LV_LOG_USER("Button pressed");
+  }
+  else if(code == LV_EVENT_RELEASED) {
+    lv_label_set_text(button_label, "Click here!");
+    LV_LOG_USER("Button released");
+  }
+}
+
+static void style_init(void) {
+  // Create a simple button style: https://docs.lvgl.io/master/overview/style.html
+  lv_style_init(&style_button);
+  lv_style_set_radius(&style_button, 10);
+  // Color documentation: https://docs.lvgl.io/master/overview/color.html
+  lv_style_set_bg_opa(&style_button, LV_OPA_COVER);  // Set the opacity
+  lv_style_set_bg_color(&style_button, lv_palette_lighten(LV_PALETTE_LIGHT_GREEN, 4));  // Set the background color
+  // Set a light green background gradient color and direction
+  lv_style_set_bg_grad_color(&style_button, lv_palette_main(LV_PALETTE_LIGHT_GREEN));
+  lv_style_set_bg_grad_dir(&style_button, LV_GRAD_DIR_VER);
+
+  // Set the border color, opacity, width, shadow (width, offset and opacity)
+  lv_style_set_border_color(&style_button, lv_palette_main(LV_PALETTE_LIME));
+  lv_style_set_border_opa(&style_button, LV_OPA_80);
+  lv_style_set_border_width(&style_button, 2);
+  lv_style_set_shadow_width(&style_button, 10);
+  lv_style_set_shadow_offset_y(&style_button, 5);
+  lv_style_set_shadow_opa(&style_button, LV_OPA_60);
+  // Set the text color
+  lv_style_set_text_color(&style_button, lv_color_hex(0x181717));
+
+  // Create a style for the button pressed state
+  // Use a color filter to simply modify all colors in this state and apply a dark effect
+  static lv_color_filter_dsc_t color_filter;
+  lv_color_filter_dsc_init(&color_filter, darken);
+  lv_style_init(&style_button_pressed);
+  lv_style_set_color_filter_dsc(&style_button_pressed, &color_filter);
+  lv_style_set_color_filter_opa(&style_button_pressed, LV_OPA_10);
+}
+
+void lv_create_main_gui_e4(void) {
+  // Initialize the style
+  style_init();
+  // Create a button and use the new styles
+  lv_obj_t * button = lv_button_create(lv_screen_active());
+  // Remove the styles coming from the default theme. Note that size and position are also stored as style properties
+  // lv_obj_remove_style_all will remove the set size and position too 
+  lv_obj_remove_style_all(button);
+  lv_obj_set_size(button, 300, 100);
+  lv_obj_add_style(button, &style_button, 0);
+  lv_obj_add_style(button, &style_button_pressed, LV_STATE_PRESSED);
+  lv_obj_align(button, LV_ALIGN_CENTER, 0, 0);
+  lv_obj_add_event_cb(button, event_handler_e4, LV_EVENT_ALL, NULL);  // Assign a callback to the button
+
+  // Add a label to the button
+  lv_obj_t * button_label = lv_label_create(button);
+  lv_label_set_text(button_label, "Click here!");
+  lv_obj_center(button_label);
+
+  static lv_style_t style_text_label; 
+  lv_style_init(&style_text_label); 
+  lv_style_set_text_font(&style_text_label, &lv_font_montserrat_34); 
+  lv_obj_add_style(button_label, &style_text_label, 0);
+
+}
