@@ -149,3 +149,51 @@ void lv_create_main_gui_e2(void) {
   lv_obj_add_event_cb(button, event_handler_e2, LV_EVENT_ALL, text_label_event);  // Assign a callback to the button
 }
 
+
+//***********************************
+//EJERCICIO 3
+//***********************************
+/*
+Tipos de botones: botones de dos estados e interruptores de palanca. 
+Estos son útiles para encender o apagar algo y mostrar su estado al mismo tiempo.
+*/
+
+// Callback that is triggered when button is clicked/toggled
+static void event_handler_bt_e3(lv_event_t * e) {
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t * button = (lv_obj_t*) lv_event_get_target(e);
+  lv_obj_t * button_label = (lv_obj_t*) lv_event_get_user_data(e);
+  if(code == LV_EVENT_VALUE_CHANGED) {
+    LV_UNUSED(button);
+    LV_LOG_USER("State: %s", lv_obj_has_state(button, LV_STATE_CHECKED) ? "On" : "Off");
+    lv_label_set_text_fmt(button_label, "Turn %s", lv_obj_has_state(button, LV_STATE_CHECKED) ? "Off" : "On");
+  }
+}
+
+// Callback that is triggered when the toggle switch changes state
+static void event_handler_ts_e3(lv_event_t * e) {
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t * toggle_switch = (lv_obj_t*) lv_event_get_target(e);
+  if(code == LV_EVENT_VALUE_CHANGED) {
+    LV_UNUSED(toggle_switch);
+    LV_LOG_USER("State: %s", lv_obj_has_state(toggle_switch, LV_STATE_CHECKED) ? "On" : "Off");
+  }
+}
+
+void lv_create_main_gui_e3(void) {
+  // Create a toggle button (button)
+  lv_obj_t * button = lv_button_create(lv_screen_active());
+  lv_obj_align(button, LV_ALIGN_CENTER, 0, -40);
+  lv_obj_add_flag(button, LV_OBJ_FLAG_CHECKABLE);
+  lv_obj_set_height(button, LV_SIZE_CONTENT);
+  lv_obj_t * button_label = lv_label_create(button);
+  lv_label_set_text(button_label, "Turn On");
+  lv_obj_center(button_label);
+  lv_obj_add_event_cb(button, event_handler_bt_e3, LV_EVENT_ALL, button_label);
+  
+  // Create a toggle switch (toggle_switch)
+  lv_obj_t * toggle_switch = lv_switch_create(lv_screen_active());
+  lv_obj_add_event_cb(toggle_switch, event_handler_ts_e3, LV_EVENT_ALL, NULL);
+  lv_obj_add_flag(toggle_switch, LV_OBJ_FLAG_EVENT_BUBBLE);
+  lv_obj_align(toggle_switch, LV_ALIGN_CENTER, 0, 40);
+}

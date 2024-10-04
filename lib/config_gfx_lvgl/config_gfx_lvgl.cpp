@@ -197,7 +197,8 @@ void config_gfx_lvgl_init()
     ******************************************************************************/
     //ui_example1();
     //lv_create_main_gui_e1();
-    lv_create_main_gui_e2(); 
+    //lv_create_main_gui_e2(); 
+    lv_create_main_gui_e3(); 
 
 
     
