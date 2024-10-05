@@ -71,7 +71,7 @@ static void event_handler_e1(lv_event_t * e) {
   
 }
 
-void lv_create_main_gui_e1(void)
+void lv_create_ui_e1_1(void)
 {
   // Create a Button 
   lv_obj_t * btn = lv_button_create(lv_screen_active());    
@@ -126,7 +126,7 @@ static void event_handler_e2(lv_event_t * e) {
   }
 }
 
-void lv_create_main_gui_e2(void) {
+void lv_create_ui_e1_2(void) {
   // Create a Button 
   lv_obj_t * button = lv_button_create(lv_screen_active());    
   lv_obj_set_size(button, 220, 80);                                  // Set the button size
@@ -180,7 +180,7 @@ static void event_handler_ts_e3(lv_event_t * e) {
   }
 }
 
-void lv_create_main_gui_e3(void) {
+void lv_create_ui_e1_3(void) {
   // Create a toggle button (button)
   lv_obj_t * button = lv_button_create(lv_screen_active());
   lv_obj_align(button, LV_ALIGN_CENTER, 0, -40);
@@ -261,7 +261,7 @@ static void style_init(void) {
   lv_style_set_color_filter_opa(&style_button_pressed, LV_OPA_10);
 }
 
-void lv_create_main_gui_e4(void) {
+void lv_create_ui_e1_4(void) {
   // Initialize the style
   style_init();
   // Create a button and use the new styles
@@ -306,7 +306,7 @@ static void event_handler_e5(lv_event_t * e) {
   LV_LOG_USER("Slider changed to %d%%", (int)lv_slider_get_value(slider));
 }
 
-void lv_create_main_gui_e5(void) {
+void lv_create_ui_e1_5(void) {
   // Style the range slider
   static lv_style_t style_main;
   lv_style_init(&style_main);
