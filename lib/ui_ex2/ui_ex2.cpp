@@ -76,7 +76,7 @@ void lv_create_ui_e2_1(void)
 }
 
 //***********************************
-//EJERCICIO 2
+// EJERCICIO 2
 //***********************************
 /*
 Mostraremos la temperatura y humedad simuladas, no sólo en etiquetas de texto 
@@ -211,4 +211,140 @@ void lv_create_ui_e2_2(void)
   lv_anim_set_repeat_count(&a_humi, LV_ANIM_REPEAT_INFINITE);
   lv_anim_start(&a_humi);
 
+}
+
+//***********************************
+// EJERCICIO 3
+//***********************************
+/*
+Crear una tabla interactiva con LVGL con datos simulados. 
+También mostraremos un botón flotante con el ícono de actualización que, al hacer clic, 
+actualizará los valores de la tabla.
+*/
+float data_temp, data_humi, data_pres, data_lumi;
+
+void get_data() {
+  float randomDec, sim_humi;
+  long randInt;
+  
+  randInt = random(0,50);   // a random integer from -90 to 90
+  randomDec = random(0, 100) / 100.0; // a random decimal number from 0.00 to 0.99
+  data_temp = randInt + randomDec; 
+  
+  randInt = random(0,100);   // a random integer from -90 to 90
+  randomDec = random(0, 100) / 100.0; // a random decimal number from 0.00 to 0.99
+  data_humi = randInt + randomDec; 
+  
+  randInt = random(800,1024);   // a random integer from -90 to 90
+  randomDec = random(0, 100) / 100.0; // a random decimal number from 0.00 to 0.99
+  data_pres = randInt + randomDec; 
+  
+  randInt = random(0,500);   // a random integer from -90 to 90
+  randomDec = random(0, 100) / 100.0; // a random decimal number from 0.00 to 0.99
+  data_lumi = randInt + randomDec; 
+
+}
+
+static lv_obj_t * table;
+
+static void update_table_values(void) { 
+  get_data();
+
+  const char degree_symbol[] = "\u00B0C";
+  
+  String bme_temp_value = String(data_temp) + degree_symbol;
+  String bme_humi_value = String(data_humi) + "%";
+  String bme_press_value = String(data_pres / 100.0F) + " hPa";
+  String ldr_value = String(data_lumi);
+  
+  // Fill the first column
+  lv_table_set_cell_value(table, 0, 0, "Data");
+  lv_table_set_cell_value(table, 1, 0, "Temperature");
+  lv_table_set_cell_value(table, 2, 0, "Humidity");
+  lv_table_set_cell_value(table, 3, 0, "Pressure");
+  lv_table_set_cell_value(table, 4, 0, "Luminosity");  
+  // Fill the second column
+  lv_table_set_cell_value(table, 0, 1, "Value");
+  lv_table_set_cell_value(table, 1, 1, bme_temp_value.c_str());
+  lv_table_set_cell_value(table, 2, 1, bme_humi_value.c_str());
+  lv_table_set_cell_value(table, 3, 1, bme_press_value.c_str());
+  lv_table_set_cell_value(table, 4, 1, ldr_value.c_str());
+}
+
+static void float_button_event_cb(lv_event_t * e) {
+  update_table_values();
+}
+
+static void draw_event_cb(lv_event_t * e) {
+  
+  lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
+  lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t*) draw_task->draw_dsc;
+  // If the cells are drawn
+  if(base_dsc->part == LV_PART_ITEMS) {
+    uint32_t row = base_dsc->id1;
+    uint32_t col = base_dsc->id2;
+
+    // Make the texts in the first cell center aligned
+    if(row == 0) {
+      lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
+      if(label_draw_dsc) {
+        label_draw_dsc->align = LV_TEXT_ALIGN_CENTER;
+      }
+      lv_draw_fill_dsc_t * fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
+      if(fill_draw_dsc) {
+        fill_draw_dsc->color = lv_color_mix(lv_palette_main(LV_PALETTE_BLUE), fill_draw_dsc->color, LV_OPA_20);
+        fill_draw_dsc->opa = LV_OPA_COVER;
+      }
+    }
+    // In the first column align the texts to the right
+    else if(col == 0) {
+      lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
+      if(label_draw_dsc) {
+        label_draw_dsc->align = LV_TEXT_ALIGN_CENTER;
+      }
+    }
+    else if(col == 1) {
+      lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
+      if(label_draw_dsc) {
+        label_draw_dsc->align = LV_TEXT_ALIGN_CENTER;
+      }
+    }
+
+    // Make every 2nd row gray color
+    if((row != 0 && row % 2) == 0) {
+      lv_draw_fill_dsc_t * fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
+      if(fill_draw_dsc) {
+        fill_draw_dsc->color = lv_color_mix(lv_palette_main(LV_PALETTE_GREY), fill_draw_dsc->color, LV_OPA_10);
+        fill_draw_dsc->opa = LV_OPA_COVER;
+      }
+    }
+  }
+}
+
+void lv_create_ui_e2_3(void) {
+  table = lv_table_create(lv_screen_active());
+
+  // Inserts or updates all table values
+  update_table_values();
+
+  // Set a smaller height to the table. It will make it scrollable
+  lv_table_set_column_width(table, 0, 300);
+  lv_table_set_column_width(table, 1, 300);
+  lv_obj_set_height(table, 300);
+  lv_obj_center(table);
+
+  // Add an event callback to apply some custom drawing
+  lv_obj_add_event_cb(table, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+  lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+
+  // Create floating button
+  lv_obj_t * float_button = lv_button_create(lv_screen_active());
+  lv_obj_set_size(float_button, 50, 50);
+  lv_obj_add_flag(float_button, LV_OBJ_FLAG_FLOATING);
+  lv_obj_align(float_button, LV_ALIGN_BOTTOM_RIGHT, -15, -15);
+  lv_obj_add_event_cb(float_button, float_button_event_cb, LV_EVENT_CLICKED, NULL);
+  lv_obj_set_style_radius(float_button, LV_RADIUS_CIRCLE, 0);
+  lv_obj_set_style_bg_image_src(float_button, LV_SYMBOL_REFRESH, 0);
+  lv_obj_set_style_text_font(float_button, lv_theme_get_font_large(float_button), 0);
+  lv_obj_set_style_bg_color(float_button, lv_palette_main(LV_PALETTE_GREEN), LV_PART_MAIN);
 }
