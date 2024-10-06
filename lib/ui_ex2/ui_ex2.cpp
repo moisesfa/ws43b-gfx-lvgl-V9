@@ -235,8 +235,8 @@ void get_data() {
   randomDec = random(0, 100) / 100.0; // a random decimal number from 0.00 to 0.99
   data_humi = randInt + randomDec; 
   
-  randInt = random(800,1024);   // a random integer from -90 to 90
-  randomDec = random(0, 100) / 100.0; // a random decimal number from 0.00 to 0.99
+  randInt = random(80000,102400);   // a random integer from -90 to 90
+  //randomDec = random(0, 100) / 100.0; // a random decimal number from 0.00 to 0.99
   data_pres = randInt + randomDec; 
   
   randInt = random(0,500);   // a random integer from -90 to 90
@@ -289,10 +289,12 @@ static void draw_event_cb(lv_event_t * e) {
       lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
       if(label_draw_dsc) {
         label_draw_dsc->align = LV_TEXT_ALIGN_CENTER;
+        label_draw_dsc->font = &lv_font_montserrat_22;
+        label_draw_dsc->color = lv_color_make(255, 255, 255);;
       }
       lv_draw_fill_dsc_t * fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
       if(fill_draw_dsc) {
-        fill_draw_dsc->color = lv_color_mix(lv_palette_main(LV_PALETTE_BLUE), fill_draw_dsc->color, LV_OPA_20);
+        fill_draw_dsc->color = lv_color_mix(lv_palette_main(LV_PALETTE_BLUE), fill_draw_dsc->color, LV_OPA_100);
         fill_draw_dsc->opa = LV_OPA_COVER;
       }
     }
@@ -301,12 +303,17 @@ static void draw_event_cb(lv_event_t * e) {
       lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
       if(label_draw_dsc) {
         label_draw_dsc->align = LV_TEXT_ALIGN_CENTER;
+        label_draw_dsc->font = &lv_font_montserrat_22;
+        //label_draw_dsc->color = lv_palette_main(LV_PALETTE_BLUE);
+        label_draw_dsc->color = lv_color_make(0, 0, 255);;
+
       }
     }
     else if(col == 1) {
       lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
       if(label_draw_dsc) {
         label_draw_dsc->align = LV_TEXT_ALIGN_CENTER;
+        label_draw_dsc->font = &lv_font_montserrat_22;
       }
     }
 
@@ -328,9 +335,10 @@ void lv_create_ui_e2_3(void) {
   update_table_values();
 
   // Set a smaller height to the table. It will make it scrollable
+  lv_obj_set_style_pad_ver(table, 30, LV_PART_ITEMS);
   lv_table_set_column_width(table, 0, 300);
   lv_table_set_column_width(table, 1, 300);
-  lv_obj_set_height(table, 300);
+  lv_obj_set_height(table, 400);
   lv_obj_center(table);
 
   // Add an event callback to apply some custom drawing
