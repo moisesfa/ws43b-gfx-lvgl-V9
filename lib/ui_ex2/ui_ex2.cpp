@@ -31,7 +31,7 @@ static void set_temp(void * text_label_temp_value, int32_t v) {
     else {
       lv_obj_set_style_text_color((lv_obj_t*) text_label_temp_value, lv_palette_main(LV_PALETTE_RED), 0);
     }
-    const char degree_symbol[] = "\u00B0C";
+    const char degree_symbol[] = "\u00BAC";
   
   String sim_temp_text = String(sim_temp) + degree_symbol;
   lv_label_set_text((lv_obj_t*) text_label_temp_value, sim_temp_text.c_str());
@@ -52,15 +52,19 @@ void lv_create_ui_e2_1(void)
   lv_style_set_text_font(&style_lb_temp, &lv_font_montserrat_32);
   lv_obj_add_style(text_label_temp, &style_lb_temp, 0);
 
-  // Create a text label in font size 36 to display the latest temperature reading
+  // Create a text label in font custom to display the latest temperature reading
+  // https://youtu.be/YCTbiHk1MHM?si=hCYQegxFxTkBYObm
+  // https://lvgl.io/tools/fontconverter
+  
   lv_obj_t * text_label_temp_value = lv_label_create(lv_screen_active());
   lv_label_set_text(text_label_temp_value, "--.--");
   lv_obj_set_style_text_align(text_label_temp_value, LV_TEXT_ALIGN_CENTER, 0);
-  lv_obj_align(text_label_temp_value, LV_ALIGN_CENTER, 0, 30);
+  lv_obj_align(text_label_temp_value, LV_ALIGN_CENTER, 0, 50);
 
+  LV_FONT_DECLARE(lv_font_alibaba_sans_bold_120);
   static lv_style_t style_temp;
   lv_style_init(&style_temp);
-  lv_style_set_text_font(&style_temp, &lv_font_montserrat_48);
+  lv_style_set_text_font(&style_temp, &lv_font_alibaba_sans_bold_120);
   lv_obj_add_style(text_label_temp_value, &style_temp, 0);
 
   // Create an animation to update the text label with the latest temperature value every 10 seconds
