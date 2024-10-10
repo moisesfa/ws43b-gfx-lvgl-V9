@@ -49,6 +49,7 @@ Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
 
 #include "ui_ex1.h"
 #include "ui_ex2.h"
+#include "ui_ex3.h"
 
 /*******************************************************************************
  * Please config the touch panel in touch.h
@@ -204,10 +205,15 @@ void config_gfx_lvgl_init()
     //lv_create_ui_e1_4(); 
     //lv_create_ui_e1_5();
     // Ejempolos 2
-    lv_create_ui_e2_1(); 
+    //lv_create_ui_e2_1(); 
     //lv_create_ui_e2_2(); 
     //lv_create_ui_e2_3(); 
     //lv_create_ui_e2_4(); 
+    // Ejempolos 3
+    lv_create_ui_e3_1(); 
+    //lv_create_ui_e3_2(); 
+    //lv_create_ui_e3_3(); 
+    //lv_create_ui_e3_4(); 
     
   }
 

@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 //***********************************
-//EJERCICIO 1
+// EJERCICIO 1
 //***********************************
 /* Mostraremos la temperatura del sensor SIMULADO en la pantalla mediante una etiqueta de texto. 
 El color del texto variará según el rango de temperatura:
