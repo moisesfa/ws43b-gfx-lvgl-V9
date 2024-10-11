@@ -61,10 +61,10 @@ void lv_create_ui_e2_1(void)
   lv_obj_set_style_text_align(text_label_temp_value, LV_TEXT_ALIGN_CENTER, 0);
   lv_obj_align(text_label_temp_value, LV_ALIGN_CENTER, 0, 50);
 
-  LV_FONT_DECLARE(lv_font_alibaba_sans_bold_120);
+  LV_FONT_DECLARE(lv_font_alibaba_sans_bold_80);
   static lv_style_t style_temp;
   lv_style_init(&style_temp);
-  lv_style_set_text_font(&style_temp, &lv_font_alibaba_sans_bold_120);
+  lv_style_set_text_font(&style_temp, &lv_font_alibaba_sans_bold_80);
   lv_obj_add_style(text_label_temp_value, &style_temp, 0);
 
   // Create an animation to update the text label with the latest temperature value every 10 seconds
