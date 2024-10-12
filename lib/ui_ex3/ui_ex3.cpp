@@ -2,6 +2,13 @@
 #include <lvgl.h>
 #include <Arduino.h>
 
+#include <WiFi.h>
+
+Preferences preferences;
+String wifi_ssid_list;
+String wifi_ssid;
+String wifi_password;
+
 //***********************************
 // EJERCICIO 1
 //***********************************
@@ -253,4 +260,215 @@ void lv_create_ui_e3_2(void)
   lv_obj_align_to(button, spinbox, LV_ALIGN_OUT_LEFT_BOTTOM, -5, 0);
   lv_obj_set_style_bg_image_src(button, LV_SYMBOL_MINUS, 0);
   lv_obj_add_event_cb(button, lv_spinbox_decrement_event_cb, LV_EVENT_ALL, NULL);
+}
+
+//***********************************
+// EJERCICIO 2
+//***********************************
+/*
+La pantalla mostrará dos campos de entrada donde podrá seleccionar su SSID e ingresar su contraseña. 
+El ESP32 se conectará a su red utilizando las credenciales proporcionadas.
+Las credenciales de red se guardarán de forma permanente en el ESP32 mediante la biblioteca de Preferencias
+https://randomnerdtutorials.com/esp32-save-data-permanently-preferences/
+*/
+
+void wifi_scan(void) {
+  Serial.println("scan start");
+  // WiFi.scanNetworks will return the number of networks found
+  int n = WiFi.scanNetworks();  
+  wifi_ssid_list = "";
+  Serial.println("scan done");
+
+  if (n == 0) {
+      Serial.println("no networks found");
+  } else {
+    Serial.print(n);
+    Serial.println(" networks found");
+    
+    for (int i = 0; i < n; ++i) {
+      wifi_ssid_list = wifi_ssid_list + WiFi.SSID(i) + '\n';
+    }
+    Serial.println(wifi_ssid_list);
+  }
+  // Delete the scan result to free memory for code below.
+  WiFi.scanDelete();
+}
+
+static lv_obj_t * kb;
+lv_obj_t * ssid_text_area;
+lv_obj_t * password_text_area;
+lv_obj_t * dropdown_field;
+
+static void text_area_event_cb(lv_event_t * e) {
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t * text_area = (lv_obj_t*) lv_event_get_target(e);
+  if(code == LV_EVENT_CLICKED || code == LV_EVENT_FOCUSED) {
+    // Focus on the clicked text area
+    if(kb != NULL) lv_keyboard_set_textarea(kb, text_area);
+  }
+  else if(code == LV_EVENT_READY) {
+    char buf[64];
+    lv_dropdown_get_selected_str(dropdown_field, buf, sizeof(buf));
+    LV_LOG_USER("SSID %s", buf);
+    LV_LOG_USER("PASSWORD %s", lv_textarea_get_text(password_text_area));
+
+    preferences.begin("credentials", false);
+
+    preferences.putString("wifi_ssid", String(buf));
+    wifi_ssid = preferences.getString("wifi_ssid", "");
+    Serial.print("ssid: ");
+    Serial.println(wifi_ssid);
+
+    preferences.putString("wifi_password", String(lv_textarea_get_text(password_text_area)));
+    wifi_password = preferences.getString("wifi_password", "");
+    Serial.print("pass: ");
+    Serial.println(wifi_password);
+
+    preferences.end();
+    lv_wifi_info_gui();
+  }
+}
+
+static void button_delete_credentials_cb(lv_event_t * e) {
+  lv_event_code_t code = lv_event_get_code(e);
+  if(code == LV_EVENT_CLICKED) {   
+    preferences.begin("credentials", false);
+    preferences.clear();
+    preferences.end();
+    ESP.restart();
+  }
+}
+
+void lv_create_ui_e3_3(void){
+  // Clear screen
+  lv_obj_clean(lv_scr_act());
+
+  wifi_scan();
+  
+  // Create a text label aligned center on top
+  lv_obj_t * text_label = lv_label_create(lv_screen_active());
+  //lv_label_set_long_mode(text_label, LV_LABEL_LONG_WRAP);   
+  lv_label_set_text(text_label, LV_SYMBOL_WIFI " Wi-Fi Manager");
+  lv_obj_set_style_text_align(text_label, LV_TEXT_ALIGN_CENTER, 0);
+  lv_obj_align(text_label, LV_ALIGN_TOP_MID, 0, 20);
+  
+  // lv_obj_t * oneline_label = lv_label_create(lv_screen_active());
+  // lv_label_set_text(oneline_label, "SSID");
+  // lv_obj_align_to(oneline_label, ssid_text_area, LV_ALIGN_TOP_RIGHT, 0, 20);
+
+  dropdown_field = lv_dropdown_create(lv_screen_active());
+  lv_dropdown_set_options_static(dropdown_field, wifi_ssid_list.c_str());
+  lv_obj_set_width(dropdown_field,lv_pct(50));
+  lv_obj_align(dropdown_field, LV_ALIGN_TOP_MID, 0, 80);
+
+  static lv_style_t style_text_ssid_pass;
+  lv_style_init(&style_text_ssid_pass);
+  lv_style_set_text_font(&style_text_ssid_pass, &lv_font_montserrat_20);
+  lv_obj_add_style(dropdown_field, &style_text_ssid_pass, 0);
+  lv_obj_t * list = lv_dropdown_get_list(dropdown_field); //Get the list/
+  lv_obj_add_style(list, &style_text_ssid_pass, 0); //Add the styles to the list/} 
+
+ // Create a label and position it above the text box
+  lv_obj_t * password_label = lv_label_create(lv_screen_active());
+  lv_label_set_text(password_label, "PASSWORD");
+  lv_obj_align_to(password_label, password_text_area, LV_ALIGN_TOP_MID, 0, 140);
+  
+  // Create the password box
+  password_text_area = lv_textarea_create(lv_screen_active());
+  lv_textarea_set_text(password_text_area, "");
+  lv_textarea_set_password_mode(password_text_area, true);
+  lv_textarea_set_one_line(password_text_area, true);
+  lv_obj_set_width(password_text_area, lv_pct(40));
+  lv_obj_set_pos(password_text_area, 5, 70);
+  lv_obj_add_event_cb(password_text_area, text_area_event_cb, LV_EVENT_ALL, NULL);
+  lv_obj_align(password_text_area, LV_ALIGN_TOP_MID, 0, 180);
+  lv_obj_add_style(password_text_area, &style_text_ssid_pass, 0); //Add the styles to the list/} 
+
+ 
+  // Create a keyboard
+  kb = lv_keyboard_create(lv_screen_active());
+  lv_obj_set_size(kb,  LV_HOR_RES, LV_VER_RES / 2);
+  lv_keyboard_set_textarea(kb, password_text_area); // Focus it on one of the text areas to start
+}
+
+void lv_wifi_info_gui(void) {
+  // Try to connect to Wi-Fi
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(wifi_ssid.c_str(), wifi_password.c_str());
+  Serial.print("Connecting to WiFi ..");
+  int i = 0;
+  while (WiFi.status() != WL_CONNECTED && i < 5) {
+    Serial.print('.');
+    delay(1000);
+    i++;
+  }
+
+  // Clear screen
+  lv_obj_clean(lv_scr_act());
+
+  // Create a text label aligned center on top ("Wi-Fi Manager")
+  lv_obj_t * text_label_0 = lv_label_create(lv_screen_active());
+  lv_label_set_long_mode(text_label_0, LV_LABEL_LONG_WRAP);   
+  lv_label_set_text(text_label_0, LV_SYMBOL_WIFI " Wi-Fi Manager");
+  lv_obj_set_style_text_align(text_label_0, LV_TEXT_ALIGN_CENTER, 0);
+  lv_obj_align(text_label_0, LV_ALIGN_CENTER, 0, -95);
+
+  static lv_style_t style_text_label;
+  lv_style_init(&style_text_label);
+  lv_style_set_text_font(&style_text_label, &lv_font_montserrat_28);
+  lv_obj_add_style(text_label_0, &style_text_label, 0);
+  
+  // If failed to connect, it will display a message saying "Failed to connect"
+  if(WiFi.status() != WL_CONNECTED) {
+    Serial.println("Failed to connect");
+    lv_obj_t * text_label_1 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(text_label_1, LV_LABEL_LONG_WRAP);
+    lv_label_set_text(text_label_1, "Failed to connect " LV_SYMBOL_CLOSE);
+    lv_obj_set_style_text_align(text_label_1, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_align(text_label_1, LV_ALIGN_CENTER, 0, -40);
+    lv_obj_add_style(text_label_1, &style_text_label, 0);
+    
+    lv_obj_t * button = lv_button_create(lv_screen_active());     // Add a button the current screen
+    lv_obj_set_size(button, 120, 50);                             // Set its size
+    lv_obj_add_event_cb(button, button_delete_credentials_cb, LV_EVENT_CLICKED, NULL);   // Assign a callback to the button
+    lv_obj_align(button, LV_ALIGN_BOTTOM_MID, 0, -20);
+    lv_obj_t * button_label = lv_label_create(button);          // Add a label to the button
+    lv_label_set_text(button_label, "RETRY");                   // Set the labels text
+    lv_obj_center(button_label);
+  } 
+  // If it connects, it will display a message saying "Connected" and the ESP IP address
+  else {
+    Serial.println("Connected to Wi-Fi");
+    lv_obj_t * text_label_1 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(text_label_1, LV_LABEL_LONG_WRAP);
+    lv_label_set_text(text_label_1, "Connected " LV_SYMBOL_OK);
+    lv_obj_set_style_text_align(text_label_1, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_align(text_label_1, LV_ALIGN_CENTER, 0, -40);
+    lv_obj_add_style(text_label_1, &style_text_label, 0);
+
+    lv_obj_t * text_label2 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(text_label2, LV_LABEL_LONG_WRAP);
+    Serial.println(WiFi.localIP());
+    Serial.print("RSSI: ");
+    Serial.println(WiFi.RSSI());
+    String local_ip = "IP ADDRESS: " + WiFi.localIP().toString();
+    lv_label_set_text(text_label2, local_ip.c_str());
+    lv_obj_set_style_text_align(text_label2, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_align(text_label2, LV_ALIGN_CENTER, 0, 0);
+
+    lv_obj_t * text_label3 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(text_label3, LV_LABEL_LONG_WRAP);
+    String rssi = "RSSI: " + String(WiFi.RSSI());
+    lv_label_set_text(text_label3, rssi.c_str());
+    lv_obj_set_style_text_align(text_label3, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_align(text_label3, LV_ALIGN_CENTER, 0, 30);
+
+    lv_obj_t * button = lv_button_create(lv_screen_active());     // Add a button the current screen
+    lv_obj_set_size(button, 120, 50);                             // Set its size
+    lv_obj_add_event_cb(button, button_delete_credentials_cb, LV_EVENT_CLICKED, NULL);     // Assign a callback to the button
+    lv_obj_align(button, LV_ALIGN_BOTTOM_MID, 0, -20);
+    lv_obj_t * button_label = lv_label_create(button);            // Add a label to the button
+    lv_label_set_text(button_label, "RESET");                     // Set the labels text
+    lv_obj_center(button_label);
+  }
 }

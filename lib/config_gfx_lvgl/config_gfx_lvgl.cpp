@@ -211,8 +211,23 @@ void config_gfx_lvgl_init()
     //lv_create_ui_e2_4(); 
     // Ejempolos 3
     //lv_create_ui_e3_1(); 
-    lv_create_ui_e3_2(); 
-    //lv_create_ui_e3_3(); 
+    //lv_create_ui_e3_2(); 
+    
+    // Open the credentials namespace and try to retrieve an SSID/Password
+    preferences.begin("credentials", false);
+    wifi_ssid = preferences.getString("wifi_ssid", ""); 
+    wifi_password = preferences.getString("wifi_password", "");
+    // Close the Preferences
+    preferences.end();
+
+    if (wifi_ssid == "" || wifi_password == ""){
+      Serial.println("No values saved for ssid or password");
+      lv_create_ui_e3_3();
+    }
+    else {
+      lv_wifi_info_gui();
+    }
+      
     //lv_create_ui_e3_4(); 
     
   }
