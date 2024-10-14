@@ -50,6 +50,7 @@ Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
 #include "ui_ex1.h"
 #include "ui_ex2.h"
 #include "ui_ex3.h"
+#include "ui_ex4.h"
 
 /*******************************************************************************
  * Please config the touch panel in touch.h
@@ -213,22 +214,23 @@ void config_gfx_lvgl_init()
     //lv_create_ui_e3_1(); 
     //lv_create_ui_e3_2(); 
     
-    // Open the credentials namespace and try to retrieve an SSID/Password
-    preferences.begin("credentials", false);
-    wifi_ssid = preferences.getString("wifi_ssid", ""); 
-    wifi_password = preferences.getString("wifi_password", "");
-    // Close the Preferences
-    preferences.end();
+    // // Open the credentials namespace and try to retrieve an SSID/Password
+    // preferences.begin("credentials", false);
+    // wifi_ssid = preferences.getString("wifi_ssid", ""); 
+    // wifi_password = preferences.getString("wifi_password", "");
+    // // Close the Preferences
+    // preferences.end();
 
-    if (wifi_ssid == "" || wifi_password == ""){
-      Serial.println("No values saved for ssid or password");
-      lv_create_ui_e3_3();
-    }
-    else {
-      lv_wifi_info_gui();
-    }
+    // if (wifi_ssid == "" || wifi_password == ""){
+    //   Serial.println("No values saved for ssid or password");
+    //   lv_create_ui_e3_3();
+    // }
+    // else {
+    //   lv_wifi_info_gui();
+    // }
       
-    //lv_create_ui_e3_4(); 
+    // Ejempolos 4
+    lv_create_ui_e4_1(); 
     
   }
 
