@@ -231,7 +231,8 @@ void config_gfx_lvgl_init()
       
     // Ejempolos 4
     // lv_create_ui_e4_1(); 
-    lv_create_ui_e4_2(); 
+    //lv_create_ui_e4_2(); 
+    lv_create_ui_e4_3(); 
     
   }
 

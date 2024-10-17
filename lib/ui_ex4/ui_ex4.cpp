@@ -73,4 +73,47 @@ void lv_create_ui_e4_2(void)
   lv_obj_align(img_led, LV_ALIGN_CENTER, 0, 0);
 }
 
+//***********************************
+// EJERCICIO 3
+//***********************************
+/*
+Agregar pestañas a su interfaz gráfica de usuario. Cada pestaña mostrará diferentes widgets. 
+Puede hacer clic en cada pestaña o deslizar el dedo hacia la izquierda o hacia la derecha para cambiar de pantalla.
+*/
+void lv_create_ui_e4_3(void)
+{
 
+// Create a Tab view object
+  lv_obj_t * tabview;
+  tabview = lv_tabview_create(lv_screen_active());
+  lv_tabview_set_tab_bar_size(tabview, 60);
+  
+  // Add 3 tabs (the tabs are page (lv_page) and can be scrolled
+  lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
+  lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
+  lv_obj_t * tab3 = lv_tabview_add_tab(tabview, "More...");
+  lv_obj_set_style_bg_color(tabview, lv_color_hex(0x003a57), 0);
+
+  // Add elements to tab1
+  LV_IMAGE_DECLARE(my_image);
+  lv_obj_t * img1 = lv_image_create(tab1);
+  lv_image_set_src(img1, &my_image);
+  lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+  /*Create a white label, set its text and align it to the center*/
+  lv_obj_t * label = lv_label_create(tab1);
+  lv_label_set_text(label, "Hello world image");
+  lv_obj_set_style_text_color(tab1, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+  lv_obj_align(label, LV_ALIGN_CENTER, 0, 100);
+
+  // Add elements to tab2
+  lv_obj_set_style_bg_color(tab2, lv_palette_lighten(LV_PALETTE_AMBER, 3), 0);
+  lv_obj_set_style_bg_opa(tab2, LV_OPA_COVER, 0);
+
+  lv_obj_set_style_bg_color(tab2, lv_color_hex(0x957012), LV_PART_MAIN);
+  img_led = lv_image_create(tab2);
+  lv_image_set_src(img_led, &image_led_off);
+  lv_obj_add_flag(img_led, LV_OBJ_FLAG_CLICKABLE);
+  lv_obj_add_event_cb(img_led, image_event_handler, LV_EVENT_ALL, NULL);
+  lv_obj_align(img_led, LV_ALIGN_CENTER, 0, 0);
+  
+}
